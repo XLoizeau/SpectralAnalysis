@@ -2,17 +2,24 @@ classdef GradientPeakDetection < SpectralPeakDetection
     properties (Constant)
         Name = 'Gradient';
         Description = '';
-        
+
         ParameterDefinitions = [];
     end
-    
-    methods        
+
+    properties
+        lag;
+    end
+
+    methods
+        function this = GradientPeakDetection(lag)
+            this.lag = lag;
+        end
         function [spectralChannels, intensities, peakDetails] = detectPeaks(obj, spectralChannels, intensities)
             % Ensure that the intensities are oriented as a row
             if(size(intensities, 2) == 1)
                 intensities = intensities';
             end
-            
+
             % Calculate first differential
             firstDerivative = gradient(intensities);
 
@@ -43,7 +50,7 @@ classdef GradientPeakDetection < SpectralPeakDetection
             indicies(toRemove) = [];
             indiciesRight(toRemove) = [];
             indiciesLeft(toRemove) = [];
-            
+
             [temp, collected] = max([intensities(indicies); intensities(indiciesRight); intensities(indiciesLeft)], [], 1);
 
             indicies = unique(sort([indicies(collected == 1) indiciesRight(collected == 2) indiciesLeft(collected == 3)]));
@@ -54,30 +61,30 @@ classdef GradientPeakDetection < SpectralPeakDetection
             % Determine the peak details
             if(nargout > 2)
                 peakDetails = zeros(length(indicies), 7);
-                
+
                 for i = 1:length(indicies)
                     ind = indicies(i);
-                    
+
                     left = ind-1;
-                    
+
                     while(left > 0 && firstDerivative(left) > 0)
                         left = left - 1;
                     end
-                    
+
                     if(left == 0)
                         left = 1;
                     end
-                    
+
                     right = ind+1;
-                    
+
                     while(right < length(firstDerivative) && firstDerivative(right) < 0)
                         right = right + 1;
                     end
-                    
-                    peakDetails(i, :) = [spectralChannels(left) spectralChannels(ind) spectralChannels(right) intensities(ind) right-left left right];                    
+
+                    peakDetails(i, :) = [spectralChannels(left) spectralChannels(ind) spectralChannels(right) intensities(ind) right-left left right];
                 end
             end
-            
+
             % Select the peaks
             spectralChannels = spectralChannels(indicies);
             intensities = intensities(indicies);

@@ -2,33 +2,33 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
     properties (Constant)
         Name = 'Gaussian'; % TODO: Provide a sensible name
         Description = '';
-        
+
         % TODO: Fill in parameter definitions
-        ParameterDefinitions = [ParameterDescription('Window Size', ParameterType.Integer, 5), ...
-                        ParameterDescription('Sigma', ParameterType.Double, 2)]; 
+        ParameterDefinitions = [ParameterDescription('Sigma', ParameterType.Double, 2)];
     end
-    
+
     properties
-        windowSize;
         sigma;
-        
+        spectralChannels;
         coeffs;
     end
-    
+
     methods
-        function this = GaussianSmoothing(windowSize, sigma)
+        function this = GaussianSmoothing(spectralChannels, sigma)
             % Store the parameters for use in the smooth function
-            this.windowSize = windowSize;
+            % this.windowSize = windowSize;
             this.sigma = sigma;
-            
-            N = (windowSize - 1) / 2;
-            this.coeffs = (1 / (sqrt(2 * pi) * sigma)) * exp(-(-N:N).^2 / (2* sigma^2));
+            this.spectralChannels = spectralChannels;
+            this.coeffs = @(obj, m) (1 / (sqrt(2 * pi) * obj.sigma)) * exp(-(obj.spectralChannels - m).^2 / (2 * obj.sigma^2));
         end
-        
-        function [spectralChannels, intensities] = smooth(obj, spectralChannels, intensities)
-            % TODO: Smooth the spectrum using any parameters required
-            
-            intensities = conv(intensities, obj.coeffs, 'same');
+
+        function [estimationPoints, estimates] = smooth(obj, estimationPoints, intensities)
+        estimationPoints = unique(estimationPoints);
+            estimates = zeros(length(estimationPoints), 1);
+            for i = 1 : length(estimationPoints)
+                coeffs = obj.coeffs(obj, estimationPoints(i));
+                estimates(i) =  coeffs' * intensities;
+            end
         end
     end
 end
