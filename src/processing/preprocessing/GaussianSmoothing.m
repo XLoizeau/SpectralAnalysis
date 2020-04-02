@@ -19,11 +19,12 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
             % this.windowSize = windowSize;
             this.sigma = sigma;
             this.spectralChannels = spectralChannels;
-            this.coeffs = @(obj, m) (1 / (sqrt(2 * pi) * obj.sigma)) * exp(-(obj.spectralChannels - m).^2 / (2 * obj.sigma^2));
+            this.coeffs = @(obj, m) (exp(-(obj.spectralChannels - m).^2 ./ (2 * obj.sigma^2)) ...
+                                        ./ sum(exp(-(obj.spectralChannels - m).^2 ./ (2 * obj.sigma^2))));
         end
 
         function [estimationPoints, estimates] = smooth(obj, estimationPoints, intensities)
-        estimationPoints = unique(estimationPoints);
+            estimationPoints = unique(estimationPoints);
             estimates = zeros(length(estimationPoints), 1);
             for i = 1 : length(estimationPoints)
                 coeffs = obj.coeffs(obj, estimationPoints(i));
