@@ -14,7 +14,7 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
     end
 
     methods
-        function coeffs = compute_coeffs(obj, m)
+        function coeffs = compute_coeffs(spectralChannels, sigma, m)
             coeffs = (obj.spectralChannels - m).^2;
             coeffs = coeffs ./ (2 * (obj.sigma^2));
             coeffs = exp(coeffs) ;
@@ -33,7 +33,7 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
             estimates = zeros(length(estimationPoints), 1);
             for i = 1 : length(estimationPoints)
                 coeffs = obj.coeffs(obj, estimationPoints(i));
-                estimates(i) =  dot(coeffs', intensities) ./ sum(coeffs);
+                estimates(i) = dot(coeffs', intensities) ./ sum(coeffs);
                 disp(sum(coeffs));
             end
         end
