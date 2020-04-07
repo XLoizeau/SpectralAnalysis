@@ -27,7 +27,7 @@ classdef GradientPeakDetection < SpectralPeakDetection
             secondDerivative = gradient(firstDerivative);
 
             % Look for zero crossings between data points
-            indicies = find((firstDerivative(1:end-1) .* firstDerivative(2:end)) <= 0);
+            indicies = find((firstDerivative(1:end-1) .* firstDerivative(2:end)) < 0);
 
             % Pull out maxima
             indicies = indicies(secondDerivative(indicies) < 0);
