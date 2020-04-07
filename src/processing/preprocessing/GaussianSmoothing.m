@@ -14,7 +14,7 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
     end
 
     methods
-        function coeffs = compute_coeffs(spectralChannels, sigma, m)
+        function coeffs = compute_coeffs(obj, m)
             coeffs = (obj.spectralChannels - m).^2;
             coeffs = coeffs ./ (2 * (obj.sigma^2));
             coeffs = exp(coeffs) ;
@@ -25,7 +25,7 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
             % this.windowSize = windowSize;
             this.sigma = sigma;
             this.spectralChannels = spectralChannels;
-            this.coeffs = @(obj, m) compute_coeffs(obj.spectralChannels, obj.sigma, m);
+            this.coeffs = @(obj, m) compute_coeffs(obj, m);
         end
 
         function [estimationPoints, estimates] = smooth(obj, estimationPoints, intensities)
