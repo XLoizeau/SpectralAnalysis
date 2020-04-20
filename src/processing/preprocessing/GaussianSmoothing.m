@@ -30,10 +30,13 @@ classdef GaussianSmoothing < SpectralSmoothing % TODO: Change SpectralSmoothing 
 
         function [estimationPoints, estimates] = smooth(obj, estimationPoints, intensities)
             estimationPoints = unique(estimationPoints);
-            estimates = zeros(length(estimationPoints), 1);
+            estimates = zeros(1, length(estimationPoints));
             for i = 1 : length(estimationPoints)
                 coeffs = obj.coeffs(obj, estimationPoints(i));
                 estimates(i) = dot(coeffs', intensities) ./ sum(coeffs);
+                if(isnan(estimates(i)))
+                  estimates(i) = 0;
+                end
             end
         end
     end
